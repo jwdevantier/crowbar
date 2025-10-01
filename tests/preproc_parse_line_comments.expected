@@ -1,0 +1,30 @@
+// <<crowbar
+// counter = 0
+// @component
+// def hello(emit):
+//     global counter
+//     counter += 1
+//     emit(f"hello{counter}")
+// >>
+// <<end>>
+
+c-style line comments:
+// <<crowbar
+// emit(hello())
+// >>
+hello1
+// <<end>>
+
+python-style line comments:
+# <<crowbar
+# emit(hello())
+# >>
+hello2
+# <<end>>
+
+lua-style line comments:
+-- <<crowbar
+-- emit(hello())
+-- >>
+hello3
+-- <<end>>

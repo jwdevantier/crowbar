@@ -1,0 +1,10 @@
+# <<crowbar
+# @component
+# def helloworld(emit):
+#     emit("hello, ")
+#     emit("world!")
+# 
+# emit(helloworld())
+# >>
+hello, world!
+# <<end>>

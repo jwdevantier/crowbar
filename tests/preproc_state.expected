@@ -1,0 +1,18 @@
+/* <<crowbar
+   x = 10
+   y = 2
+   >> /*
+/* <<end>> */
+
+Something
+
+# <<crowbar
+# @component
+# def output(emit):
+#     emit(f"x + y <=> {x} + {y} = {x + y}")
+# emit(output())
+# >>
+x + y <=> 10 + 2 = 12
+# <<end>>
+
+Goodbye

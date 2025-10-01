@@ -1,0 +1,18 @@
+# <<crowbar
+# counter = 0
+# @component
+# def hello(emit):
+#     global counter
+#     counter += 1
+#     emit(f"hello{counter}")
+# >>
+# <<end>>
+
+0 indent:
+# <<crowbar emit(hello())>>
+# <<end>>
+
+3 indent:
+   # <<crowbar emit(hello())>>
+   # <<end>>
+

@@ -1,0 +1,24 @@
+c-style, 1
+/* <<crowbar
+   counter = 0
+   @component
+   def hello(emit):
+       global counter
+       counter += 1
+       emit(f"hello{counter}")
+   >> */
+/* <<end>> */
+
+c-style, prefixed lines:
+/* <<crowbar
+ * emit(hello())
+ * >> */
+hello1
+/* <<end>> */
+
+lua-style line comments:
+--[[ <<crowbar
+     emit(hello())
+>>
+hello2
+--[[ <<end>> ]]--

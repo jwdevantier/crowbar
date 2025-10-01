@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Install Nix
+      uses: cachix/install-nix-action@v25
+      with:
+        nix_path: nixpkgs=channel:nixos-25.05
+        
+    - name: Create .python-dev-root marker
+      run: touch .python-dev-root
+      
+    - name: Run all checks and tests
+      run: |
+        nix develop --impure --command bash -c "
+          echo 'Running linting...'
+          python tasks.py lint
+          
+          echo 'Checking code formatting...'
+          python tasks.py format --check
+          
+          echo 'Running tox tests (multi-version)...'
+          python tasks.py tox
+
+          echo 'Generating site...'
+          python tasks.py gensite
+        "

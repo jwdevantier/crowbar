@@ -1,0 +1,8 @@
+# NOTE: in this example, we use Python-style line comments.
+# The `#` prefixed every marker line here has nothing to do with Crowbar!
+
+# <<crowbar
+  ... python code here ...
+# >>
+... output here ...
+# <<end>>

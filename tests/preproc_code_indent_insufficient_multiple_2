@@ -1,0 +1,17 @@
+
+--- Commentary
+The line is insufficiently indented. Crowbar will not know the source language,
+(we can't), so indentation is inferred.
+
+In this case, there are multiple lines, so we check that each line's inferred
+prefix is the same. In this case, it won't be, so we detect the invalid
+indentation and raise an IndentationError
+
+---
+
+# <<crowbar
+  print("should not matter")
+ for x in range(10):
+    print("it'll still fail")
+# >>
+# <<end>>

@@ -1,0 +1,15 @@
+
+--- Commentary
+The line is insufficiently indented. Crowbar will not know the source language,
+(we can't), so we infer that ' p' is the indentation + possible line-comment
+prefix.
+
+In case of more lines, we additionally check that each code line shares the same
+prefix of characters from line start to the offset of the block opening marker.
+But even this is insufficient if the block e.g. calls `render` multiple times.
+---
+
+# <<crowbar
+ print("should not matter")
+# >>
+# <<end>>

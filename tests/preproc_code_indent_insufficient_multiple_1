@@ -1,0 +1,19 @@
+
+--- Commentary
+The line is insufficiently indented. Crowbar will not know the source language,
+(we can't), so we infer that ' p' is the indentation + possible line-comment
+prefix.
+
+Because there are multiple code lines, we'll then validate that all share the
+same prefix. If code lines are differnt, e.g. by some lines calling render(),
+others looping or setting vars, then a second indentation check will catch it.
+
+However, if the lines all share the same prefix, as multiple calls to a function
+would, then we still pass the incorrectly inferred code off for evaluation.
+---
+
+# <<crowbar
+ print("should not matter")
+ print("it'll still fail")
+# >>
+# <<end>>
