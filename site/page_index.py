@@ -10,7 +10,14 @@ import tempfile
 import os
 from typing import Optional
 from datetime import datetime
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
+from pygments.styles.pastie import PastieStyle
 
+
+class CustomPastieStyle(PastieStyle):
+    background_color = "#f9fafb"  # bg-gray-50 in tailwindcss
 
 
 SITE_DIR = Path(__file__).parent.resolve()
@@ -18,6 +25,8 @@ SITE_DIR = Path(__file__).parent.resolve()
 
 with open(SITE_DIR / "site.css") as fh:
     CSS = [line.rstrip('\n') for line in fh.readlines()]
+
+_formatter = HtmlFormatter(style=CustomPastieStyle)
 
 @component
 def site_header(emit):
@@ -49,10 +58,6 @@ def site_footer(emit):
         section("References"),
         div(
             {"class": "mb-4"},
-            p(
-                "Examples: ",
-                a({"href": "#"}, "docs/examples"),
-            ),
             p(
                 "Source Code: ",
                 a({"href": "https://github.com/jwdevantier/crowbar"}, "github.com/jwdevantier/crowbar"),
@@ -88,7 +93,7 @@ def section(emit, title):
 
 
 @component
-def code_block(emit, code):
+def code_block(emit, code, lang: Optional[str] = None):
     """generate a box for displaying code, reads files if desired, applies HTML-escaping"""
     if code[0] == '@':
         with open(SITE_DIR / code[1:], mode="r") as fh:
@@ -96,9 +101,14 @@ def code_block(emit, code):
     elif isinstance(code, Path):
         with open(SITE_DIR / code, mode="r") as fh:
             code = fh.read()
+    output: str
+    if lang is None:
+        output = htmllib.escape(code)
+    else:
+        output = highlight(code, get_lexer_by_name(lang), _formatter)
     emit(
-        '<pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm">',
-        htmllib.escape(code),
+        '<pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto">',
+        output,
         '</pre>'
     )
 
@@ -130,16 +140,16 @@ def resolve_path(p: Fpath) -> Path:
 
 
 @component
-def example(emit, code: Fpath, sep = None):
+def example(emit, code: Fpath, sep = None, lang: Optional[str] = None):
     code_path = resolve_path(code)
-    emit(code_block(code))
+    emit(code_block(code, lang=lang))
     if sep is not None:
         emit(sep)
     p = CrowbarPreprocessor()
     with WithNamedTempFile() as tmp:
         p.process_file(code_path, tmp.path)
         with open(tmp.path, mode="r") as fh:
-            emit(code_block(fh.read()))
+            emit(code_block(fh.read(), lang=lang))
 
 
 # TODO: rewrite to align more with htt docs, use scribble terms
@@ -191,7 +201,8 @@ site_body = body(
         sep=p(
             PARAGRAPH_ATTRS,
             "After running, the file would look like so:"
-        )
+        ),
+        lang="cpp"
     ),
     p(
         PARAGRAPH_ATTRS,
@@ -200,7 +211,7 @@ site_body = body(
         emph("marker lines"), "."
         )
     ),
-    code_block("@examples/block_example"),
+    code_block("@examples/block_example", lang="python"),
     p(
         PARAGRAPH_ATTRS,
         "Crowbar works for any language or file format which can support line- *or* multi-line comments "
@@ -268,13 +279,14 @@ site_body = body(
         PARAGRAPH_ATTRS,
         "While this is a lot of code to print out one C function, it can pay off when you have a larger list of entities to render out."
     ),
-    code_block("@examples/c_func_utils.py"),
+    code_block("@examples/c_func_utils.py", lang="python"),
     example(
         "@examples/components_ex_c_func.c",
         sep=p(
             PARAGRAPH_ATTRS,
             "Finally, when asking Crowbar to process the file, we get:"
-        )
+        ),
+        lang="c"
     ),
     site_footer()
 )
@@ -291,7 +303,7 @@ def index_page(emit):
                 meta({"name": "viewport", "content": "width=device-width, initial-scale=1.0"}),
                 title("Crowbar - When Clever Hacking Fails, Crude Whacking Prevails!"),
                 script({"src": "https://cdn.tailwindcss.com"}),
-                style(*CSS)
+                style(*CSS, *(_formatter.get_style_defs(".highlight").split("\n")))
             ),
             site_body
         )
