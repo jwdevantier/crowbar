@@ -96,6 +96,48 @@ def test_render_multiple_elements():
     assert "".join(out) == "hello, thing1!\nhello, thing2!"
 
 
+def test_list_indents():
+    out = []
+
+    @component
+    def smth(emit):
+        emit(
+            "if (cond) {",
+            [
+                "then1;",
+                "if (special_cond) {",
+                [
+                    "special1;",
+                ],
+                "}",
+            ],
+            "} else if (other_cond) {",
+            [
+                "other_then1;",
+                "other_then2;",
+            ],
+            "}",
+            "stuff();",
+        )
+
+    emit = Emitter(writer=out.append, base_indent="", indent_step="   ")
+    emit(smth())
+    assert (
+        "".join(out)
+        == """\
+if (cond) {
+   then1;
+   if (special_cond) {
+      special1;
+   }
+} else if (other_cond) {
+   other_then1;
+   other_then2;
+}
+stuff();"""
+    )
+
+
 def test_indents():
     out = []
 

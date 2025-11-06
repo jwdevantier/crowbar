@@ -288,6 +288,8 @@ class Emitter:
                     self.indent_level += 1
                 elif arg == dedent:
                     self.indent_level = max(0, self.indent_level - 1)
+            elif isinstance(arg, list):
+                self.__call__(indent, *arg, dedent)
             elif isinstance(arg, ComponentClosure):
                 # component with context, provide emit function
                 arg(self.__call__)
