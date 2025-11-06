@@ -1,0 +1,96 @@
+.. first (and only) line should say "hello"
+# <<crowbar
+# emit("hello")
+# >>
+hello
+# <<end>>
+
+.. fl's at the start of a block should be a NO-OP, the line is already
+a "fresh" line.
+# <<crowbar
+# emit(fl, "hello")
+# >>
+hello
+# <<end>>
+
+.. fl's are still NO-OPs in this context, same result as before
+# <<crowbar
+# emit(fl, fl, "hello")
+# >>
+hello
+# <<end>>
+
+.. expect first line to be empty
+# <<crowbar
+# emit(nl, "hello")
+# >>
+
+hello
+# <<end>>
+
+.. expect two first lines to be empty
+# <<crowbar
+# emit(nl, nl, "hello")
+# >>
+
+
+hello
+# <<end>>
+
+.. fl should be NO-OP, so still expecting two first lines to be empty
+# <<crowbar
+# emit(nl, nl, fl, "hello")
+# >>
+
+
+hello
+# <<end>>
+
+--- now with indentation
+.. first (and only) line should say "hello"
+# <<crowbar
+# emit(indent, "hello")
+# >>
+  hello
+# <<end>>
+
+.. fl's at the start of a block should be a NO-OP, the line is already
+a "fresh" line.
+# <<crowbar
+# emit(indent, fl, "hello")
+# >>
+  hello
+# <<end>>
+
+.. fl's are still NO-OPs in this context, same result as before
+# <<crowbar
+# emit(indent, fl, fl, "hello")
+# >>
+  hello
+# <<end>>
+
+.. expect first line to be empty
+# <<crowbar
+# emit(indent, nl, "hello")
+# >>
+
+  hello
+# <<end>>
+
+.. expect two first lines to be empty
+# <<crowbar
+# emit(indent, nl, nl, "hello")
+# >>
+
+
+  hello
+# <<end>>
+
+.. fl should be NO-OP, so still expecting two first lines to be empty
+# <<crowbar
+# emit(indent, nl, nl, fl, "hello")
+# >>
+
+
+  hello
+# <<end>>

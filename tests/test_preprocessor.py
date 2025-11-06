@@ -78,6 +78,13 @@ def test_multiple_emits_inline():
     )
 
 
+def test_first_line():
+    """Ensure we handle the special case of the first line(s) emitted."""
+    assert process_file(CWD / "preproc_first_line") == slurp(
+        CWD / "preproc_first_line.expected"
+    )
+
+
 def test_file_unchanged_on_parse_error():
     # we know that IF the file would be written, whatever was in the output
     # sections of existing blocks would have been cleared and whatever output

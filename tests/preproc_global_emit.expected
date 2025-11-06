@@ -3,7 +3,7 @@
 # def greet(emit, name):
 #     emit(f"hello, {name}!")
 # 
-# emit(nl, "hello", "world", indent, fl, greet("Gordon"))
+# emit(nl, "hello", lc, "world", indent, greet("Gordon"))
 # >>
 
 helloworld

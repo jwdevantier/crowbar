@@ -2,7 +2,12 @@
 # @component
 # def helloworld(emit):
 #     emit("hello, ")
+#     emit(lc, "world!")
+# 
+#     emit("hello, ", lc)
 #     emit("world!")
+# 
+#     emit("hello, ", lc, "world!")
 # 
 # emit(helloworld())
 # >>

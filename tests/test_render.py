@@ -17,14 +17,17 @@ def test_kw_args():
     assert "".join(out) == "hello, gordon!"
 
     out.clear()
+    emit = Emitter(writer=out.append)
     emit(greet(name="alex"))
     assert "".join(out) == "hello, alex!"
 
     out.clear()
+    emit = Emitter(writer=out.append)
     emit(greet())
     assert "".join(out) == "hello, thing!"
 
     out.clear()
+    emit = Emitter(writer=out.append)
     emit(greet())
     assert "".join(out) == "hello, thing!"
 
@@ -42,13 +45,37 @@ def test_args():
     assert "".join(out) == "hello, gordon!!"
 
     out.clear()
+    emit = Emitter(writer=out.append)
     emit(greet("alex"))
     assert "".join(out) == "hello, alex!!"
 
 
-def test_inline_render():
-    """If components don't use nl or fl control characters,
-    then two or more components are rendered onto the same line."""
+def test_render_inline():
+    """If components are separated by the `lc` (line-continue) marker, then they are
+    the next element starts on the same line as the previous element."""
+    counter = 1
+
+    @component
+    def greet(emit, name=None):
+        nonlocal counter
+        if name is None:
+            name = f"thing{counter}"
+            counter += 1
+        emit(f"hello, {name}!")
+
+    out = []
+    emit = Emitter(writer=out.append)
+
+    # single component
+    emit(greet(), lc)
+    emit(greet())
+    assert "".join(out) == "hello, thing1!hello, thing2!"
+
+
+def test_render_multiple_elements():
+    """If components don't use nl, fl, or lc control markers,
+    then two or more components are separated by newlines (and appropriately indented)
+    """
 
     counter = 1
 
@@ -66,7 +93,7 @@ def test_inline_render():
     # single component
     emit(greet())
     emit(greet())
-    assert "".join(out) == "hello, thing1!hello, thing2!"
+    assert "".join(out) == "hello, thing1!\nhello, thing2!"
 
 
 def test_indents():
@@ -77,16 +104,12 @@ def test_indents():
         emit(
             "hello1",
             indent,
-            nl,
             "hello2",
             indent,
-            nl,
             "hello3",
             dedent,
-            nl,
             "hello2",
             dedent,
-            nl,
             "hello1",
         )
 
@@ -176,9 +199,9 @@ def test_composing_components():
     def strjoin(emit, sep=", ", components=[]):
         if len(components) == 0:
             return
-        emit(components[0])
+        emit(lc, components[0])
         for c in components[1:]:
-            emit(sep, c)
+            emit(lc, sep, lc, c)
 
     @component
     def cfunc(emit, label=None, args=None, ret="void", body=None):
@@ -186,18 +209,19 @@ def test_composing_components():
             args = []
         if label is None:
             raise RuntimeError("must name the function")
+        # TODO: remove or revisit
         # if body and not isinstance(body, Component):
         #     raise RuntimeError("body MUST be None or a Component")
+
         emit(
-            fl,
             ret,
+            lc,
             f" {label}(",
             strjoin(sep=", ", components=args),
+            lc,
             ") {",
             indent,
-            nl,
             body,
-            fl,
             dedent,
             "}",
         )
