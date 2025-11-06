@@ -108,7 +108,7 @@ def code_block(emit, code, lang: Optional[str] = None):
         output = highlight(code, get_lexer_by_name(lang), _formatter)
     emit(
         '<pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto">',
-        output,
+        lc, output, lc,
         '</pre>'
     )
 
@@ -140,14 +140,17 @@ def resolve_path(p: Fpath) -> Path:
 
 
 @component
-def example(emit, code: Fpath, sep = None, lang: Optional[str] = None):
+def example(emit, code: Fpath, sep = None, lang: Optional[str] = None,
+            indent_step: str = "  ",
+            show_code_first: bool = True):
     code_path = resolve_path(code)
-    emit(code_block(code, lang=lang))
+    if show_code_first:
+        emit(code_block(code, lang=lang))
     if sep is not None:
         emit(sep)
     p = CrowbarPreprocessor()
     with WithNamedTempFile() as tmp:
-        p.process_file(code_path, tmp.path)
+        p.process_file(code_path, tmp.path, indent_step=indent_step)
         with open(tmp.path, mode="r") as fh:
             emit(code_block(fh.read(), lang=lang))
 
@@ -247,16 +250,31 @@ site_body = body(
         "tokens to control newlines and indentation. The marker tokens are:"
     ),
     ul(
-        marker("nl (newline)", "insert newline at this point"),
-        marker("fl (fresh line)", "insert newline iff. line already has content on it"),
+        marker("nl (newline)", "insert (additional) newline at this point"),
         marker("indent", "increase level of indentation used for new lines"),
         marker("dedent", "decrease level of indentation used for new lines"),
+        marker("lc (line-continue)", "each parameter to emit is normally placed on its own line, this ensures the next element follows directly after the former, on the same line."),
+        marker("fl (fresh line)", "insert newline iff. line already has content on it (only relevant if you want to override a lc token)"),
     ),
     p(
         PARAGRAPH_ATTRS,
         "This API makes formatting output much easier. In particular, abstracting indentation out this way "
         "permits components to be composable blocks, which may be nested in various ways and yet still the "
         "combined output is properly indented."
+    ),
+    section("Using lists to represent indentation"),
+    p(
+        PARAGRAPH_ATTRS,
+        "Crowbar strives to handle complex output much better than templating, but still make it easy "
+        "to recognize the shape of the generated output. To that end, you can use python lists to wrap "
+        "elements that must be indented. This makes it easier to see in the code how the generated output "
+        "uses indentation, for example:"
+    ),
+    example(
+        "@examples/lists_indent.py",
+        show_code_first=False,
+        indent_step="    ",
+        lang="python"
     ),
     section("Components - compose and reuse!"),
     p(
@@ -280,12 +298,13 @@ site_body = body(
         "While this is a lot of code to print out one C function, it can pay off when you have a larger list of entities to render out."
     ),
     code_block("@examples/c_func_utils.py", lang="python"),
+    p(
+        PARAGRAPH_ATTRS,
+        "We can then generate a C function using a block like this:"
+    ),
     example(
         "@examples/components_ex_c_func.c",
-        sep=p(
-            PARAGRAPH_ATTRS,
-            "Finally, when asking Crowbar to process the file, we get:"
-        ),
+        show_code_first=False,
         lang="c"
     ),
     site_footer()
