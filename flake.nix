@@ -67,7 +67,8 @@
             cd "$dev_root"
 
             if [ -f "pyproject.toml" ]; then
-              poetry sync
+			# poetry sync
+			  poetry install --sync
               echo "entering"
               source .venv/bin/activate
             else

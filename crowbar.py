@@ -266,7 +266,7 @@ class Emitter:
     def get_indent_string(self) -> str:
         return self.base_indent + (self.indent_step * self.indent_level)
 
-    def add_to_buffer(self, text: str, force_newline: bool = False) -> None:
+    def add_to_buffer(self, text: str) -> None:
         if not text:
             return
 
@@ -275,11 +275,7 @@ class Emitter:
 
         self.writer(text)
 
-        if force_newline:
-            self.writer("\n")
-            self.fresh_line = True
-        else:
-            self.fresh_line = False
+        self.fresh_line = False
 
     def __call__(self, *args: Any) -> None:
         for arg in args:
@@ -311,7 +307,7 @@ class Emitter:
 
             else:
                 # String or other - add to buffer WITHOUT automatic newline
-                self.add_to_buffer(str(arg), force_newline=False)
+                self.add_to_buffer(str(arg))
 
 
 def _block_parser(
