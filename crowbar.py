@@ -524,6 +524,11 @@ def main() -> None:
     )
     parser.add_argument("input_file", help="file to process")
     parser.add_argument(
+        "--indent-by",
+        default="   ",
+        help="line prefix to add for each level of indentation",
+    )
+    parser.add_argument(
         "output_file",
         nargs="?",
         default=None,
@@ -545,7 +550,10 @@ def main() -> None:
     processor = CrowbarPreprocessor()
     try:
         processor.process_file(
-            args.input_file, args.output_file, omit_code_blocks=args.no_code_blocks
+            args.input_file,
+            args.output_file,
+            indent_step=args.indent_by,
+            omit_code_blocks=args.no_code_blocks,
         )
     except Exception as e:
         print(f"Error processing file: {e}")
