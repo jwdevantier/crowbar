@@ -33,7 +33,7 @@
               ];
           buildInputs = with pkgs; [
             # each release should support non-EOL'ed versions of Python, see
-			# https://devguide.python.org/versions/
+            # https://devguide.python.org/versions/
             python313
             python312
             python311
@@ -67,8 +67,7 @@
             cd "$dev_root"
 
             if [ -f "pyproject.toml" ]; then
-              poetry install --sync
-              #poetry shell
+              poetry sync
               echo "entering"
               source .venv/bin/activate
             else
