@@ -435,6 +435,7 @@ class CrowbarPreprocessor:
             "lc": lc,
             "indent": indent,
             "dedent": dedent,
+            "indent_by": indent_step,
             "__builtins__": __builtins__,
             # Include previously imported modules and globals
             **self.crowbar_globals,
@@ -443,7 +444,9 @@ class CrowbarPreprocessor:
         # Collect rendered output
         output_parts: List[str] = []
         e = Emitter(
-            writer=output_parts.append, base_indent=base_indent, indent_step=indent_step
+            writer=output_parts.append,
+            base_indent=base_indent,
+            indent_step=exec_globals["indent_by"],
         )
 
         # convenience method, allows calling emit directly in code blocks
