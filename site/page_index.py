@@ -224,7 +224,7 @@ site_body = body(
         "from the output. This is helpful when writing small one-shot/passive generators, as you would "
         "for project starter templates and such. To omit the blocks from the output, run crowbar like so: "
     ),
-    code_block("python --no-code-blocks input-file output-file"),
+    code_block("python crowbar.py --no-code-blocks input-file output-file"),
     section("Why use crowbar?"),
     ul(
         "BSD-2 license",
