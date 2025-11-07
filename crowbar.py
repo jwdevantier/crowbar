@@ -92,7 +92,7 @@ import tempfile
 import sys
 import os
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __description__ = "Crowbar - When clever hacking fails, crude whacking works!"
 
 
