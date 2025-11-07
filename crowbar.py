@@ -435,7 +435,7 @@ class CrowbarPreprocessor:
             "lc": lc,
             "indent": indent,
             "dedent": dedent,
-            "indent_by": indent_step,
+            "indent_step": indent_step,
             "__builtins__": __builtins__,
             # Include previously imported modules and globals
             **self.crowbar_globals,
@@ -446,7 +446,7 @@ class CrowbarPreprocessor:
         e = Emitter(
             writer=output_parts.append,
             base_indent=base_indent,
-            indent_step=exec_globals["indent_by"],
+            indent_step=exec_globals["indent_step"],
         )
 
         # convenience method, allows calling emit directly in code blocks
@@ -524,7 +524,7 @@ def main() -> None:
     )
     parser.add_argument("input_file", help="file to process")
     parser.add_argument(
-        "--indent-by",
+        "--indent-step",
         default="   ",
         help="line prefix to add for each level of indentation",
     )
@@ -552,7 +552,7 @@ def main() -> None:
         processor.process_file(
             args.input_file,
             args.output_file,
-            indent_step=args.indent_by,
+            indent_step=args.indent_step,
             omit_code_blocks=args.no_code_blocks,
         )
     except Exception as e:

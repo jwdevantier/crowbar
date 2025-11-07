@@ -3,13 +3,18 @@ from crowbar import Component
 from typing import Optional, Dict, Any
 
 
-@component
-def strjoin(emit, sep=", ", components=[]):
-    if len(components) == 0:
-        return
-    emit(components[0])
-    for c in components[1:]:
-        emit(sep, c)
+def lst_interleave_val(seq, lst):
+    if not isinstance(seq, (list, tuple)):
+        seq = [seq]
+    return [x for item in lst for x in (*seq, item)]
+
+
+def fmt_attrs(attrs: dict) -> str:
+    _attrs = {**attrs}
+    cls = _attrs.pop("cls", "")
+    if cls:
+        _attrs["class"] = cls
+    return " ".join(f'{k}="{v}"' for k,v in _attrs.items())
 
 
 def elem(tag: str, default_attrs: Optional[Dict[str, Any]]=None, inline=False) -> Component:
@@ -25,36 +30,33 @@ def elem(tag: str, default_attrs: Optional[Dict[str, Any]]=None, inline=False) -
         attrs = {**d_attrs}
         if _attrs:
             attrs.update(**_attrs)
-        maybe_fl = fl if len(children) > 0 and not inline else None
+        maybe_lc = lc if inline else None
+        _body = lst_interleave_val(maybe_lc, children)
         if len(attrs.keys()) > 0:
-            emit(maybe_fl, f"<{tag} ", strjoin(" ", [
-                f'{key}="{value}"'
-                for key, value in attrs.items()]),
-                 ">", indent)
+            _attrs_str = fmt_attrs(attrs)
+            tag_open = f"<{tag} {_attrs_str}>"
         else:
-            emit(maybe_fl, f"<{tag}>", indent)
-        for elem in children:
-            emit(maybe_fl, elem)
-        emit(maybe_fl, dedent, f"</{tag}>", maybe_fl)
+            tag_open = f"<{tag}>"
+        emit(tag_open,
+             _body,
+             maybe_lc, f"</{tag}>")
     tagfn.__name__ = tag
     return tagfn
 
 
 def voidelem(tag: str, default_attrs: Optional[Dict[str, Any]] = None, inline=False) -> Component:
     d_attrs = default_attrs or {}
-    maybe_fl = None if inline else fl
     @component
     def tagfn(emit, attrs: Optional[Dict[str, Any]] = None):
         all_attrs = {**d_attrs}
         if attrs:
             all_attrs.update(**attrs)
         if all_attrs:
-            emit(maybe_fl, f"<{tag} ", strjoin(" ", [
-                f'{key}="{value}"'
-                for key, value in all_attrs.items()]),
-                 "/>", maybe_fl)
+            _attrs_str = fmt_attrs(all_attrs)
+            _tag = f"<{tag} {_attrs_str}/>"
         else:
-            emit(maybe_fl, f"<{tag}/>", maybe_fl)
+            _tag = f"<{tag}/>"
+        emit(_tag)
     tagfn.__name__ = tag
     return tagfn
 
@@ -62,12 +64,12 @@ def voidelem(tag: str, default_attrs: Optional[Dict[str, Any]] = None, inline=Fa
 # <<crowbar
 # elems = [
 #     "html", "head", "script", "style",
-#     "body", "div", "p",
+#     "body", "div",
 #     "h1", "h2", "h3", "h4", "h5", "h6",
 # ]
 # for tag in elems:
 #     emit(fl, f'{tag}: Component = elem("{tag}")')
-# elems_inline = ["title", "pre", "span", "a"]
+# elems_inline = ["title", "pre", "span", "a", "p"]
 # for tag in elems_inline:
 #     emit(fl, f'{tag}: Component = elem("{tag}", inline=True)')
 # voidelems = [
@@ -82,7 +84,6 @@ script: Component = elem("script")
 style: Component = elem("style")
 body: Component = elem("body")
 div: Component = elem("div")
-p: Component = elem("p")
 h1: Component = elem("h1")
 h2: Component = elem("h2")
 h3: Component = elem("h3")
@@ -93,6 +94,7 @@ title: Component = elem("title", inline=True)
 pre: Component = elem("pre", inline=True)
 span: Component = elem("span", inline=True)
 a: Component = elem("a", inline=True)
+p: Component = elem("p", inline=True)
 hr: Component = voidelem("hr")
 img: Component = voidelem("img")
 input: Component = voidelem("input")
@@ -116,7 +118,6 @@ __all__ = [
     "style",
     "body",
     "div",
-    "p",
     "h1",
     "h2",
     "h3",
@@ -127,6 +128,7 @@ __all__ = [
     "pre",
     "span",
     "a",
+    "p",
     "hr",
     "img",
     "input",

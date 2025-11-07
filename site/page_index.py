@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+
 sys.path.insert(1, str(Path(__file__).parent.parent))
 from crowbar import *
 from crowbar import Fpath
@@ -74,16 +75,33 @@ def site_footer(emit):
             ),
             p(
                 "Version: ", crowbar.__version__
+            ),
+        )
+    )
+
+
+@component
+def section(emit, title, **attrs):
+    cls = attrs.get("cls", "")
+    attrs.pop("cls", None)
+    emit(
+        div(
+            {"class": f"section-header mt-8 mb-4 {cls}", **attrs},
+            span(
+                {"class": "font-bold"},
+                f"# {title}"
             )
         )
     )
 
 
 @component
-def section(emit, title):
+def subsection(emit, title, **attrs):
+    cls = attrs.get("cls", "")
+    attrs.pop("cls", None)
     emit(
         div(
-            {"class": "section-header mt-8 mb-4"},
+            {"class": f"section-header mt-4 mb-2 text-sm {cls}", **attrs},
             span(
                 {"class": "font-bold"},
                 f"# {title}"
@@ -158,15 +176,13 @@ def example(emit, code: Fpath, sep = None, lang: Optional[str] = None,
 # TODO: rewrite to align more with htt docs, use scribble terms
 @component
 def ul(emit, *elems):
-    emit(
-        fl,
-        '<ul class="list-disc list-inside pl-4 space-y-1 mb-6">', nl, indent)
+    emit('<ul class="list-disc list-inside pl-4 space-y-1 mb-6">', indent)
     for elem in elems:
         if isinstance(elem, str):
-            emit(fl, f"<li>{elem}</li>")
+            emit(f"<li>{elem}</li>")
         else:
-            emit(fl, elem)
-    emit(dedent, nl, '</ul>')
+            emit(elem)
+    emit(dedent, "</ul>")
 
 
 PARAGRAPH_ATTRS = {"class": "mb-6"}
@@ -174,9 +190,33 @@ MARK_START = htmllib.escape("<<crowbar")
 MARK_OUT = htmllib.escape(">>")
 MARK_END = htmllib.escape("<<end>>")
 
+
+def esc(val):
+    return htmllib.escape(val)
+
+
+def lst_interleave_val(val, lst):
+    return [x for item in lst for x in (val, item)]
+
+
+@component
+def tag(emit, tag, *body, **attrs):
+    cls = attrs.pop("cls", "")
+    if cls:
+        attrs["class"] = cls
+    _attrs = " ".join(f'{k}={v}' for k,v in attrs.items())
+    _body = lst_interleave_val(lc, body)
+    emit(f"<{tag} {_attrs}>", *_body, lc, f"</{tag}>")
+
+
+@component
+def li(emit, *body, **attrs):
+    emit(tag("li", *body, **attrs))
+
+
 @component
 def marker(emit, elem, desc):
-    emit(f'<li><code class="text-sm">{elem}</code> &ndash; {desc}</li>')
+    emit(li(tag("code", elem, cls="text-sm"), f" &ndash; {desc}"))
 
 
 site_body = body(
@@ -185,7 +225,7 @@ site_body = body(
     section("Abstract"),
     p(
         PARAGRAPH_ATTRS,
-        "Crowbar is a code- and content-generation tool. It allows you to embed blocks", nl,
+        "Crowbar is a code- and content-generation tool. It allows you to embed blocks "
         "of Python inside a file to dynamically generate content inside an otherwise static file."
     ),
     section("What does it do?"),
@@ -240,20 +280,25 @@ site_body = body(
     section("The emit() API"),
     p(
         PARAGRAPH_ATTRS,
-        code("emit()"), " is the equivalent of ", code("print()"), " for Crowbar. Not using ", code("print()"),
-        " directly means Crowbar does not need to capture all stdout/stderr, and this means that you can use "
-        "print-debugging and that output is not impacted by print statements scattered in the code you use. "
+        code("emit()"), "is the equivalent of ", code("print()"), " for Crowbar. Each argument is a ",
+        emph("Component"), ", a ", emph("marker token"), "or a string(ifiable) value. By "
+        "default, each argument is placed on a separate line, unless the line continue (", code("lc"),
+        ") token is used to continue output on the same line."
     ),
     p(
         PARAGRAPH_ATTRS,
-        "Moreover, ", code("emit()"), " knows how to render Crowbar's components, and uses special marker ",
-        "tokens to control newlines and indentation. The marker tokens are:"
+        'Components are annotated functions, which act as composable "templates" or building-blocks for ',
+        "generating more complex output. We cover those later."
+    ),
+    p(
+        PARAGRAPH_ATTRS,
+        "Marker tokens are used to control newlines and indentation, the marker tokens are:"
     ),
     ul(
-        marker("nl (newline)", "insert (additional) newline at this point"),
         marker("indent", "increase level of indentation used for new lines"),
         marker("dedent", "decrease level of indentation used for new lines"),
         marker("lc (line-continue)", "each parameter to emit is normally placed on its own line, this ensures the next element follows directly after the former, on the same line."),
+        marker("nl (newline)", "insert (additional) newline at this point"),
         marker("fl (fresh line)", "insert newline iff. line already has content on it (only relevant if you want to override a lc token)"),
     ),
     p(
@@ -283,7 +328,8 @@ site_body = body(
         "Think of components as building blocks, responsible for rendering some smaller element, and which "
         "can in turn delegate to other components. A component takes an ", code("emit()"), " function, but "
         "can take any additional arguments (positional and by keyword). When the component is invoked, the "
-        "resulting value can be passed to ", code("emit()"), ", and indentation will just work&trade;"
+        "resulting value can be passed to ", code("emit()"), " ", emph("or"), " as a parameter to another "
+        "component. Either way, indentation will just work&trade;"
     ),
     # TODO: minimal example
     # TODO: summary, what is a component
@@ -306,6 +352,77 @@ site_body = body(
         "@examples/components_ex_c_func.c",
         show_code_first=False,
         lang="c"
+    ),
+    section("Infrequently asked questions"),
+    div(
+        {"class": "ml-2"},
+        subsection("How does crowbar find blocks?"),
+        p(
+            'Crowbar only looks for those "marker lines", lines containing ',
+            code(MARK_START), ", ", code(MARK_OUT), " and ", code(MARK_END), ". "
+        ),
+    ),
+    div(
+        {"class": "ml-2"},
+        subsection("How does crowbar extract code from a block?"),
+        p(
+            "It takes every line between the line containing ", code(MARK_START), " and the line "
+            "containing ", code(MARK_OUT),
+            ", then strips off the first N characters from each line, where N is the number of "
+            f"characters between the start of the line and the first `<` in ",
+            code(MARK_START),
+        ),
+        p(
+            {"class": "mt-2"},
+            "This is why we say that Crowbar is language agnostic, this ",
+            "approach, while imposing stricter requirements on indenting code lines, allows us ",
+            "to use Crowbar in any type of file so long as that syntax supports line or multi-line "
+            "comments."
+        ),
+    ),
+    div(
+        {"class": "ml-2"},
+        subsection("How are blocks processed?"),
+        p(
+            "Each file is read once, top to bottom, and each block is parsed in-order. "
+            "If any block raises an exception, processing stops and the file remains unchanged. "
+            "Variables defined in one block are available to subsequent blocks."
+        ),
+    ),
+    div(
+        {"class": "ml-2"},
+        subsection("How do I configure indentation?"),
+        p(
+            "A line's indentation is essentially N times some indentation string, where "
+            "N corresponds to the indentation level."
+        ),
+        p(
+            {"class": "mt-2"},
+            "If using crowbar as a preprocessor (", code(esc("python crowbar.py <file>")), "), "
+            "add the `", code(esc("--indent-step '<string>'")), "` flag to specify the indentation string."
+        ),
+        p(
+            {"class": "mt-2"},
+            "If using Crowbar's API from a Python script, pass `", code(esc('indent_step="<string>"')), "` "
+            "when creating an ", code("Emitter"), "."
+        )
+    ),
+    div(
+        {"class": "ml-2"},
+        subsection("Does my indentation of the block affect the indentation of the output?"),
+        p(
+            "No. You only indent the block as you want to make it look nice within the file. "
+            "The only things affecting how the output is indented are:",
+            div(
+                    {"class": "mt-2"},
+            ul(
+                li("The current indentation level, controlled by ", code("indent"), " ",
+                   "and ", code("dedent"), " marker tokens."),
+                li("The chosen ", code("indent_step"), " string. See the question above.")
+            )
+
+            )
+        ),
     ),
     site_footer()
 )

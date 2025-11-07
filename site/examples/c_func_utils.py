@@ -7,7 +7,7 @@ def join(emit, sep=", ", *components):
         return
     if not isinstance(sep, list):
         sep = [sep]
-    emit(*sep, components[0])
+    emit(components[0])
     for c in components[1:]:
         emit(*sep, c)
 
@@ -19,7 +19,8 @@ def cfunc(emit, label=None, args=None, ret="void", body=None):
         raise RuntimeError("must name the function")
     emit(
         f"{ret} {label}(",
-        join([lc, ", ", lc], *args),
+        # use `lc` place elements on the same line
+        lc, join([lc, ", ", lc], *args),
         lc, ") {",
         # alternatively; wrap elements to be indented in a list
         # [ body ]
