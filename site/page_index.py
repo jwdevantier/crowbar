@@ -250,9 +250,15 @@ site_body = body(
     p(
         PARAGRAPH_ATTRS,
         span(
-        "Lines with ", code(MARK_START), ", ", code(MARK_OUT), " and ", code(MARK_END), " are ",
-        emph("marker lines"), "."
-        )
+        "Lines with ", code(MARK_START), ", ", code(MARK_OUT), " and ", code(MARK_END), " tokens are ",
+        emph("marker lines"), ".",
+        ),
+    ),
+    p(
+        PARAGRAPH_ATTRS,
+        emph("Important; each of these tokens must be aligned in the block - this is required to not "
+             "confuse contents in the code- and output for a legitimate marker line.")
+
     ),
     code_block("@examples/block_example", lang="python"),
     p(

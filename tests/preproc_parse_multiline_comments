@@ -19,6 +19,6 @@ hello1
 lua-style line comments:
 --[[ <<crowbar
      emit(hello())
->>
+     >>
 hello2
 --[[ <<end>> ]]--

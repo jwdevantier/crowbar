@@ -362,7 +362,9 @@ def _block_parser(
             else:
                 code_lines = []
                 line = next_line()
-                while line is not None and MARKER_CODE_END not in line:
+                while line is not None and not line[_start:].startswith(
+                    MARKER_CODE_END
+                ):
                     code_lines.append(line)
                     yield True, line
                     line = next_line()
@@ -390,7 +392,7 @@ def _block_parser(
                 code_lines = [cl[_start:] for cl in code_lines]  # strip prefix
             # skip past all the output from last run
             line = next_line()  # skip code end marker line
-            while line is not None and MARKER_OUTPUT_END not in line:
+            while line is not None and not line[_start:].startswith(MARKER_OUTPUT_END):
                 line = next_line()  # skip output lines
             if line is None:
                 raise UnexpectedEOF(

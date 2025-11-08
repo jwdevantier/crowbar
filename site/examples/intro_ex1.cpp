@@ -2,5 +2,5 @@
 /*<<crowbar
   for fname in ["do_something", "do_another_thing", "do_last_thing"]:
       emit(f"void mylib_{fname}();")
->> */
-// <<end>>
+  >> */
+//<<end>>
