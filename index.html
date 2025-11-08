@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Crowbar - When Clever Hacking Fails, Crude Whacking Prevails!</title>
+      <script src="https://cdn.tailwindcss.com">
+      </script>
+      <style>
+         body {
+             font-family: 'Courier New', monospace;
+             background: #ffffff;
+             color: #000000;
+             line-height: 1.4;
+         }
+         
+         a {
+             color: #ff6600;
+             text-decoration: underline;
+         }
+         
+         a:hover {
+             color: #cc5200;
+         }
+         
+         .section-header {
+             color: #ff6600;
+             font-weight: bold;
+         }
+         
+         .logo-placeholder {
+             width: 150px;
+             height: 120px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             text-align: center;
+             font-size: 12px;
+             margin-right: 2rem;
+             flex-shrink: 0;
+         }
+         
+         .logo-placeholder img {
+             max-width: 150px;
+             max-height: 120px;
+             width: auto;
+             height: auto;
+             object-fit: contain;
+         }
+         
+         
+         .header-section {
+             display: flex;
+             align-items: center;
+             margin-bottom: 2rem;
+             flex-wrap: wrap;
+         }
+         
+         @media (max-width: 640px) {
+             .header-section {
+                 flex-direction: column;
+                 text-align: center;
+             }
+             .logo-placeholder {
+                 margin-right: 0;
+                 margin-bottom: 1rem;
+             }
+         }
+         pre { line-height: 125%; }
+         td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+         span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+         td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+         span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+         .highlight .hll { background-color: #ffffcc }
+         .highlight { background: #f9fafb; }
+         .highlight .c { color: #888 } /* Comment */
+         .highlight .err { color: #A61717; background-color: #E3D2D2 } /* Error */
+         .highlight .k { color: #080; font-weight: bold } /* Keyword */
+         .highlight .ch { color: #888 } /* Comment.Hashbang */
+         .highlight .cm { color: #888 } /* Comment.Multiline */
+         .highlight .cp { color: #C00; font-weight: bold } /* Comment.Preproc */
+         .highlight .cpf { color: #888 } /* Comment.PreprocFile */
+         .highlight .c1 { color: #888 } /* Comment.Single */
+         .highlight .cs { color: #C00; font-weight: bold; background-color: #FFF0F0 } /* Comment.Special */
+         .highlight .gd { color: #000; background-color: #FDD } /* Generic.Deleted */
+         .highlight .ge { font-style: italic } /* Generic.Emph */
+         .highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+         .highlight .gr { color: #A00 } /* Generic.Error */
+         .highlight .gh { color: #333 } /* Generic.Heading */
+         .highlight .gi { color: #000; background-color: #DFD } /* Generic.Inserted */
+         .highlight .go { color: #888 } /* Generic.Output */
+         .highlight .gp { color: #555 } /* Generic.Prompt */
+         .highlight .gs { font-weight: bold } /* Generic.Strong */
+         .highlight .gu { color: #666 } /* Generic.Subheading */
+         .highlight .gt { color: #A00 } /* Generic.Traceback */
+         .highlight .kc { color: #080; font-weight: bold } /* Keyword.Constant */
+         .highlight .kd { color: #080; font-weight: bold } /* Keyword.Declaration */
+         .highlight .kn { color: #080; font-weight: bold } /* Keyword.Namespace */
+         .highlight .kp { color: #080 } /* Keyword.Pseudo */
+         .highlight .kr { color: #080; font-weight: bold } /* Keyword.Reserved */
+         .highlight .kt { color: #888; font-weight: bold } /* Keyword.Type */
+         .highlight .m { color: #00D; font-weight: bold } /* Literal.Number */
+         .highlight .s { color: #D20; background-color: #FFF0F0 } /* Literal.String */
+         .highlight .na { color: #369 } /* Name.Attribute */
+         .highlight .nb { color: #038 } /* Name.Builtin */
+         .highlight .nc { color: #B06; font-weight: bold } /* Name.Class */
+         .highlight .no { color: #036; font-weight: bold } /* Name.Constant */
+         .highlight .nd { color: #555 } /* Name.Decorator */
+         .highlight .ne { color: #B06; font-weight: bold } /* Name.Exception */
+         .highlight .nf { color: #06B; font-weight: bold } /* Name.Function */
+         .highlight .nl { color: #369; font-style: italic } /* Name.Label */
+         .highlight .nn { color: #B06; font-weight: bold } /* Name.Namespace */
+         .highlight .py { color: #369; font-weight: bold } /* Name.Property */
+         .highlight .nt { color: #B06; font-weight: bold } /* Name.Tag */
+         .highlight .nv { color: #369 } /* Name.Variable */
+         .highlight .ow { color: #080 } /* Operator.Word */
+         .highlight .w { color: #BBB } /* Text.Whitespace */
+         .highlight .mb { color: #00D; font-weight: bold } /* Literal.Number.Bin */
+         .highlight .mf { color: #00D; font-weight: bold } /* Literal.Number.Float */
+         .highlight .mh { color: #00D; font-weight: bold } /* Literal.Number.Hex */
+         .highlight .mi { color: #00D; font-weight: bold } /* Literal.Number.Integer */
+         .highlight .mo { color: #00D; font-weight: bold } /* Literal.Number.Oct */
+         .highlight .sa { color: #D20; background-color: #FFF0F0 } /* Literal.String.Affix */
+         .highlight .sb { color: #D20; background-color: #FFF0F0 } /* Literal.String.Backtick */
+         .highlight .sc { color: #D20; background-color: #FFF0F0 } /* Literal.String.Char */
+         .highlight .dl { color: #D20; background-color: #FFF0F0 } /* Literal.String.Delimiter */
+         .highlight .sd { color: #D20; background-color: #FFF0F0 } /* Literal.String.Doc */
+         .highlight .s2 { color: #D20; background-color: #FFF0F0 } /* Literal.String.Double */
+         .highlight .se { color: #04D; background-color: #FFF0F0 } /* Literal.String.Escape */
+         .highlight .sh { color: #D20; background-color: #FFF0F0 } /* Literal.String.Heredoc */
+         .highlight .si { color: #33B; background-color: #FFF0F0 } /* Literal.String.Interpol */
+         .highlight .sx { color: #2B2; background-color: #F0FFF0 } /* Literal.String.Other */
+         .highlight .sr { color: #080; background-color: #FFF0FF } /* Literal.String.Regex */
+         .highlight .s1 { color: #D20; background-color: #FFF0F0 } /* Literal.String.Single */
+         .highlight .ss { color: #A60; background-color: #FFF0F0 } /* Literal.String.Symbol */
+         .highlight .bp { color: #038 } /* Name.Builtin.Pseudo */
+         .highlight .fm { color: #06B; font-weight: bold } /* Name.Function.Magic */
+         .highlight .vc { color: #369 } /* Name.Variable.Class */
+         .highlight .vg { color: #D70 } /* Name.Variable.Global */
+         .highlight .vi { color: #33B } /* Name.Variable.Instance */
+         .highlight .vm { color: #369 } /* Name.Variable.Magic */
+         .highlight .il { color: #00D; font-weight: bold } /* Literal.Number.Integer.Long */
+      </style>
+   </head>
+   <body class="max-w-4xl mx-auto p-8">
+      <div class="header-section">
+         <div class="logo-placeholder">
+            <img src="logo.png"/>
+         </div>
+         <div>
+            <h1 class="text-4xl font-bold mb-2">
+               CROWBAR
+            </h1>
+            <p class="text-lg italic">"When clever hacking fails, crude whacking prevails!"</p>
+         </div>
+      </div>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Abstract</span>
+      </div>
+      <p class="mb-6">Crowbar is a code- and content-generation tool. It allows you to embed blocks of Python inside a file to dynamically generate content inside an otherwise static file.</p>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># What does it do?</span>
+      </div>
+      <p class="mb-6">Crowbar principally works as a preprocessor. It scans your file for specially formatted blocks, evaluates the code in those blocks and inserts the output of those evaluations back into the source file.</p>
+      <p class="mb-6">For example, say we wanted to generate some forward declarations of some C functions:</p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="c1">// This is my C file</span>
+<span class="cm">/*&lt;&lt;crowbar</span>
+<span class="cm">  for fname in [&quot;do_something&quot;, &quot;do_another_thing&quot;, &quot;do_last_thing&quot;]:</span>
+<span class="cm">      emit(f&quot;void mylib_{fname}();&quot;)</span>
+<span class="cm">  &gt;&gt; */</span>
+<span class="c1">//&lt;&lt;end&gt;&gt;</span>
+</pre></div>
+</pre>
+      <p class="mb-6">After running, the file would look like so:</p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="c1">// This is my C file</span>
+<span class="cm">/*&lt;&lt;crowbar</span>
+<span class="cm">  for fname in [&quot;do_something&quot;, &quot;do_another_thing&quot;, &quot;do_last_thing&quot;]:</span>
+<span class="cm">      emit(f&quot;void mylib_{fname}();&quot;)</span>
+<span class="cm">  &gt;&gt; */</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">mylib_do_something</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">mylib_do_another_thing</span><span class="p">();</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">mylib_do_last_thing</span><span class="p">();</span>
+<span class="c1">//&lt;&lt;end&gt;&gt;</span>
+</pre></div>
+</pre>
+      <p class="mb-6"><span>Lines with <code class="text-sm">&lt;&lt;crowbar</code>, <code class="text-sm">&gt;&gt;</code> and <code class="text-sm">&lt;&lt;end&gt;&gt;</code> tokens are <emph class="italic">marker lines</emph>.</span></p>
+      <p class="mb-6"><emph class="italic">Important; each of these tokens must be aligned in the block - this is required to not confuse contents in the code- and output for a legitimate marker line.</emph></p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="c1"># NOTE: in this example, we use Python-style line comments.</span>
+<span class="c1"># The `#` prefixed every marker line here has nothing to do with Crowbar!</span>
+
+<span class="c1"># &lt;&lt;crowbar</span>
+  <span class="o">...</span> <span class="n">python</span> <span class="n">code</span> <span class="n">here</span> <span class="o">...</span>
+<span class="c1"># &gt;&gt;</span>
+<span class="o">...</span> <span class="n">output</span> <span class="n">here</span> <span class="o">...</span>
+<span class="c1"># &lt;&lt;end&gt;&gt;</span>
+</pre></div>
+</pre>
+      <p class="mb-6">Crowbar works for any language or file format which can support line- *or* multi-line comments in some way. Because of this, you have to indent each line of code in your blocks to match the start of the <code class="text-sm">&lt;&lt;crowbar</code> marker, as shown above.</p>
+      <p class="mb-6">Also, if you want to write the output elsewhere, you can also omit the code-blocks themselves from the output. This is helpful when writing small one-shot/passive generators, as you would for project starter templates and such. To omit the blocks from the output, run crowbar like so: </p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto">python crowbar.py --no-code-blocks input-file output-file</pre>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Why use crowbar?</span>
+      </div>
+      <ul class="list-disc list-inside pl-4 space-y-1 mb-6">
+         <li>BSD-2 license</li>
+         <li>Single-file</li>
+         <li>*Zero* external dependencies</li>
+         <li>Supports Python 3.10 and up</li>
+         <li>Use as preprocessor or use API in your own Python scripts for advanced generation</li>
+         <li>Supports reuse and composition via definition of Components</li>
+      </ul>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># The emit() API</span>
+      </div>
+      <p class="mb-6"><code class="text-sm">emit()</code>is the equivalent of <code class="text-sm">print()</code> for Crowbar. Each argument is a <emph class="italic">Component</emph>, a <emph class="italic">marker token</emph>or a string(ifiable) value. By default, each argument is placed on a separate line, unless the line continue (<code class="text-sm">lc</code>) token is used to continue output on the same line.</p>
+      <p class="mb-6">Components are annotated functions, which act as composable "templates" or building-blocks for generating more complex output. We cover those later.</p>
+      <p class="mb-6">Marker tokens are used to control newlines and indentation, the marker tokens are:</p>
+      <ul class="list-disc list-inside pl-4 space-y-1 mb-6">
+         <li ><code class=text-sm>indent</code> &ndash; increase level of indentation used for new lines</li>
+         <li ><code class=text-sm>dedent</code> &ndash; decrease level of indentation used for new lines</li>
+         <li ><code class=text-sm>lc (line-continue)</code> &ndash; each parameter to emit is normally placed on its own line, this ensures the next element follows directly after the former, on the same line.</li>
+         <li ><code class=text-sm>nl (newline)</code> &ndash; insert (additional) newline at this point</li>
+         <li ><code class=text-sm>fl (fresh line)</code> &ndash; insert newline iff. line already has content on it (only relevant if you want to override a lc token)</li>
+      </ul>
+      <p class="mb-6">This API makes formatting output much easier. In particular, abstracting indentation out this way permits components to be composable blocks, which may be nested in various ways and yet still the combined output is properly indented.</p>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Using lists to represent indentation</span>
+      </div>
+      <p class="mb-6">Crowbar strives to handle complex output much better than templating, but still make it easy to recognize the shape of the generated output. To that end, you can use python lists to wrap elements that must be indented. This makes it easier to see in the code how the generated output uses indentation, for example:</p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="c1"># &lt;&lt;crowbar</span>
+<span class="c1"># emit(</span>
+<span class="c1"># &#39;if condition:&#39;, [</span>
+<span class="c1">#    &#39;print(&quot;then this&quot;)&#39;,</span>
+<span class="c1">#    &#39;if something_more:&#39;, [</span>
+<span class="c1">#        &#39;print(&quot;inner condition&quot;)&#39;</span>
+<span class="c1">#    ],</span>
+<span class="c1">#    &#39;print(&quot;still in outermost if-block&quot;)&#39;</span>
+<span class="c1"># ],</span>
+<span class="c1"># &#39;print(&quot;outside if-blocks&quot;)&#39;</span>
+<span class="c1"># )</span>
+<span class="c1"># &gt;&gt;</span>
+<span class="k">if</span> <span class="n">condition</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;then this&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">something_more</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inner condition&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;still in outermost if-block&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;outside if-blocks&quot;</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;end&gt;&gt;</span>
+</pre></div>
+</pre>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Components - compose and reuse!</span>
+      </div>
+      <p class="mb-6">Components is an additional feature that really separates Crowbar from tools like Cog. Think of components as building blocks, responsible for rendering some smaller element, and which can in turn delegate to other components. A component takes an <code class="text-sm">emit()</code> function, but can take any additional arguments (positional and by keyword). When the component is invoked, the resulting value can be passed to <code class="text-sm">emit()</code> <emph class="italic">or</emph> as a parameter to another component. Either way, indentation will just work&trade;</p>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Components Example</span>
+      </div>
+      <p class="mb-6">Below we write a series of components which collectively make rendering a C function easy. Because we want to define several components, we put them in a separate Python file. This means we get full editor support: syntax highlighting, LSP, debugging and more.</p>
+      <p class="mb-6">While this is a lot of code to print out one C function, it can pay off when you have a larger list of entities to render out.</p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">crowbar</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="nd">@component</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">join</span><span class="p">(</span><span class="n">emit</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">components</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Insert `sep` between each element.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="p">[</span><span class="n">sep</span><span class="p">]</span>
+    <span class="n">emit</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">emit</span><span class="p">(</span><span class="o">*</span><span class="n">sep</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="nd">@component</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cfunc</span><span class="p">(</span><span class="n">emit</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ret</span><span class="o">=</span><span class="s2">&quot;void&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;must name the function&quot;</span><span class="p">)</span>
+    <span class="n">emit</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ret</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">(&quot;</span><span class="p">,</span>
+        <span class="c1"># use `lc` place elements on the same line</span>
+        <span class="n">lc</span><span class="p">,</span> <span class="n">join</span><span class="p">([</span><span class="n">lc</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">lc</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span>
+        <span class="n">lc</span><span class="p">,</span> <span class="s2">&quot;) {&quot;</span><span class="p">,</span>
+        <span class="c1"># alternatively; wrap elements to be indented in a list</span>
+        <span class="c1"># [ body ]</span>
+        <span class="n">indent</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">dedent</span><span class="p">,</span>
+        <span class="s2">&quot;}&quot;</span>
+    <span class="p">)</span>
+
+<span class="nd">@component</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">param</span><span class="p">(</span><span class="n">emit</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">emit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ctype</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nd">@component</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zebody</span><span class="p">(</span><span class="n">emit</span><span class="p">):</span>
+    <span class="n">emit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;return x + y;&quot;</span><span class="p">)</span>
+</pre></div>
+</pre>
+      <p class="mb-6">We can then generate a C function using a block like this:</p>
+      <pre class="mb-6 bg-gray-50 p-4 border border-gray-300 text-sm overflow-x-auto"><div class="highlight"><pre><span></span><span class="cm">/*&lt;&lt;crowbar</span>
+<span class="cm">  from c_func_utils import *</span>
+<span class="cm">  emit(</span>
+<span class="cm">      cfunc(</span>
+<span class="cm">          label=&quot;add&quot;,</span>
+<span class="cm">          args=[param(&quot;int&quot;, &quot;x&quot;), param(&quot;int&quot;, &quot;y&quot;)],</span>
+<span class="cm">          ret=&quot;int&quot;,</span>
+<span class="cm">          body=zebody(),</span>
+<span class="cm">      ),</span>
+<span class="cm">  )</span>
+<span class="cm">  &gt;&gt; */</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//&lt;&lt;end&gt;&gt;</span>
+</pre></div>
+</pre>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># Infrequently asked questions</span>
+      </div>
+      <div class="ml-2">
+         <div class="section-header mt-4 mb-2 text-sm ">
+            <span class="font-bold"># How does crowbar find blocks?</span>
+         </div>
+         <p>Crowbar only looks for those "marker lines", lines containing <code class="text-sm">&lt;&lt;crowbar</code>, <code class="text-sm">&gt;&gt;</code> and <code class="text-sm">&lt;&lt;end&gt;&gt;</code>. </p>
+      </div>
+      <div class="ml-2">
+         <div class="section-header mt-4 mb-2 text-sm ">
+            <span class="font-bold"># How does crowbar extract code from a block?</span>
+         </div>
+         <p>It takes every line between the line containing <code class="text-sm">&lt;&lt;crowbar</code> and the line containing <code class="text-sm">&gt;&gt;</code>, then strips off the first N characters from each line, where N is the number of characters between the start of the line and the first `<` in <code class="text-sm">&lt;&lt;crowbar</code></p>
+         <p class="mt-2">This is why we say that Crowbar is language agnostic, this approach, while imposing stricter requirements on indenting code lines, allows us to use Crowbar in any type of file so long as that syntax supports line or multi-line comments.</p>
+      </div>
+      <div class="ml-2">
+         <div class="section-header mt-4 mb-2 text-sm ">
+            <span class="font-bold"># How are blocks processed?</span>
+         </div>
+         <p>Each file is read once, top to bottom, and each block is parsed in-order. If any block raises an exception, processing stops and the file remains unchanged. Variables defined in one block are available to subsequent blocks.</p>
+      </div>
+      <div class="ml-2">
+         <div class="section-header mt-4 mb-2 text-sm ">
+            <span class="font-bold"># How do I configure indentation?</span>
+         </div>
+         <p>A line's indentation is essentially N times some indentation string, where N corresponds to the indentation level.</p>
+         <p class="mt-2">If using crowbar as a preprocessor (<code class="text-sm">python crowbar.py &lt;file&gt;</code>), add the `<code class="text-sm">--indent-step &#x27;&lt;string&gt;&#x27;</code>` flag to specify the indentation string.</p>
+         <p class="mt-2">If using Crowbar's API from a Python script, pass `<code class="text-sm">indent_step=&quot;&lt;string&gt;&quot;</code>` when creating an <code class="text-sm">Emitter</code>.</p>
+      </div>
+      <div class="ml-2">
+         <div class="section-header mt-4 mb-2 text-sm ">
+            <span class="font-bold"># Does my indentation of the block affect the indentation of the output?</span>
+         </div>
+         <p>No. You only indent the block as you want to make it look nice within the file. The only things affecting how the output is indented are:<div class="mt-2">
+               <ul class="list-disc list-inside pl-4 space-y-1 mb-6">
+                  <li >The current indentation level, controlled by <code class="text-sm">indent</code> and <code class="text-sm">dedent</code> marker tokens.</li>
+                  <li >The chosen <code class="text-sm">indent_step</code> string. See the question above.</li>
+               </ul>
+            </div></p>
+      </div>
+      <hr class="border-t border-gray-400 my-8"/>
+      <div class="section-header mt-8 mb-4 ">
+         <span class="font-bold"># References</span>
+      </div>
+      <div class="mb-4">
+         <p>Source Code: <a href="https://github.com/jwdevantier/crowbar">github.com/jwdevantier/crowbar</a></p>
+         <p>Bug reports: <a href="https://github.com/jwdevantier/crowbar/issues">github.com/jwdevantier/crowbar/issues</a></p>
+      </div>
+      <div class="text-sm text-gray-600 mt-8">
+         <p>Generated on: 08/11/2025</p>
+         <p>Version: 0.3.2</p>
+      </div>
+   </body>
+</html>
