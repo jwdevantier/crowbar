@@ -96,6 +96,18 @@ __version__ = "0.3.1"
 __description__ = "Crowbar - When clever hacking fails, crude whacking works!"
 
 
+if True:
+    MIN_MAJOR = 3
+    MIN_MINOR = 10
+    v = sys.version_info
+    if v.major <= 3 and v.minor < 10:
+        print(
+            f"Crowbar requires Python {MIN_MAJOR}.{MIN_MINOR} or later",
+            f" (you have {v.major}.{v.minor})",
+        )
+        sys.exit(1)
+
+
 # Special marker types
 class _Marker:
     def __init__(self, marker_type: str):
